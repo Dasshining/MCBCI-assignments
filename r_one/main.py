@@ -19,10 +19,8 @@ def split_data(data):
     return data[:half], data[half:]
 
 def build_frequency_table(data, target):
-    # Retrieves 
     features = [key for key in data[0] if key != target]
     target_values = set(row[target] for row in data)
-    # print(f"Target values: {target_values}")
 
     freq_table = {}
     for feature in features:
@@ -36,7 +34,6 @@ def build_frequency_table(data, target):
             value = row[feature]
             t_val = row[target]
             freq_table[feature][value][t_val] += 1
-    print(f"Frecuency table: {freq_table}")
     return freq_table
 
 def train_one_r(freq_table):
@@ -93,12 +90,31 @@ def train_one_r(freq_table):
     # Return the best feature and its rule
     return best_feature, best_rule
 
+def test_one_r_model(data, target, best_feature, model):
+    # Test the OneR model using the frequency table
+    total_count = 0
+    error = 0
+    for row in data:
+        total_count += 1
+        feature_value = row[best_feature]
+        predicted_class = model[feature_value]
+        real_class = row[target]
+        print(f"Predicted: {predicted_class}, Real: {real_class}")
+        if predicted_class == real_class:
+            print("Correct prediction!")
+        else:
+            error += 1
+            print("Incorrect prediction.")
+    print(f"Total predictions: {total_count}")
+    print(f"Total errors: {error}")
+    print(f"Total predictions: {error/total_count*100}%")
 
 def main():
     print(dic_list)
     train_data, test_data = split_data(dic_list)
     freq_table = build_frequency_table(train_data, 'Class')
-    train_one_r(freq_table)
+    feature, model = train_one_r(freq_table)
+    test_one_r_model(test_data, 'Class', feature, model)
 
 main()
 

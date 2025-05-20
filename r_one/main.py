@@ -1,5 +1,5 @@
 import openpyxl
-# Test commits
+import random
 
 # Cargar el archivo y la hoja
 wb = openpyxl.load_workbook("golf-dataset-categorical.xlsx")
@@ -14,9 +14,21 @@ for row in ws.iter_rows(min_row=2, values_only=True):
     dic = dict(zip(headers, row))
     dic_list.append(dic)
 
-def split_data(data):
-    half = (len(data)//2)+1
-    return data[:half], data[half:]
+# Imprimir la lista de diccionarios
+def print_dic_list(dic_list):
+    for dic in dic_list:
+        print(dic)
+    print("\n")
+
+def split_data(data, probability=50):
+    training_lines = int(len(data) * (probability / 100))
+    test_lines = int(len(data) - training_lines)
+    # Shuffle the data
+    random.shuffle(data)
+    # Split the data into training and test sets
+    training_dict = data[:training_lines]
+    test_dict = data[training_lines:training_lines + test_lines]
+    return training_dict, test_dict
 
 def build_frequency_table(data, target):
     features = [key for key in data[0] if key != target]
@@ -110,8 +122,10 @@ def test_one_r_model(data, target, best_feature, model):
     print(f"Total predictions: {error/total_count*100}%")
 
 def main():
-    print(dic_list)
-    train_data, test_data = split_data(dic_list)
+    print_dic_list(dic_list)
+    train_data, test_data = split_data(dic_list, 20)
+    print_dic_list(train_data)
+    print_dic_list(test_data)
     freq_table = build_frequency_table(train_data, 'Class')
     feature, model = train_one_r(freq_table)
     test_one_r_model(test_data, 'Class', feature, model)

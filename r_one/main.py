@@ -78,7 +78,7 @@ def train_one_r(freq_table):
                 # print(f"        temp: {temp_target_value}")
             # Calculate the sum of target values for the feature    
             sum_target_per_feature += temp_target_value
-        print(f"{feature} probability: {sum_target_per_feature}/{sum_target_value}")
+        print(f"{feature} probability: {sum_target_per_feature}/{sum_target_value}\n")
         # Check if this is the first feature being evaluated
         if best_feature == None:
             best_feature = feature
@@ -97,7 +97,7 @@ def train_one_r(freq_table):
     for value, counts in freq_table[best_feature].items():
         best_target = min(counts, key=counts.get)
         best_rule[value] = best_target 
-    print(f"Best rule: {best_rule}")
+    print(f"Best rule: {best_rule}\n")
     
     # Return the best feature and its rule
     return best_feature, best_rule
@@ -109,14 +109,19 @@ def test_one_r_model(data, target, best_feature, model):
     for row in data:
         total_count += 1
         feature_value = row[best_feature]
-        predicted_class = model[feature_value]
-        real_class = row[target]
-        print(f"Predicted: {predicted_class}, Real: {real_class}")
-        if predicted_class == real_class:
-            print("Correct prediction!")
-        else:
+        try:
+            predicted_class = model[feature_value]
+            real_class = row[target]
+            print(f"Predicted: {predicted_class}, Real: {real_class}")
+            if predicted_class == real_class:
+                print("Correct prediction!\n")
+            else:
+                error += 1
+                print("Incorrect prediction.\n")
+        except KeyError:
+            # Handle the case where the feature value is not in the model
+            print(f"Feature value '{feature_value}' not found in model. Skipping...\n")
             error += 1
-            print("Incorrect prediction.")
     print(f"Total predictions: {total_count}")
     print(f"Total errors: {error}")
     print(f"Total predictions: {error/total_count*100}%")
